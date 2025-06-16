@@ -25,7 +25,7 @@ The application uses a clean white, blue, and red color palette:
 ### Prerequisites
 
 - A modern web browser
-- A local web server (optional, for development)
+- VS Code with Live Server extension (recommended)
 
 ### Installation
 
@@ -35,24 +35,15 @@ git clone <your-repo-url>
 cd flex-bus
 ```
 
-2. Serve the application:
+2. Open in VS Code and start Live Server:
+   - Open the project folder in VS Code
+   - Right-click on `index.html`
+   - Select "Open with Live Server"
+   - The application will automatically open in your browser
 
-**Option 1: Using Python (recommended)**
-```bash
-python -m http.server 8000
-```
-
-**Option 2: Using Node.js**
-```bash
-npx serve .
-```
-
-**Option 3: Using PHP**
-```bash
-php -S localhost:8000
-```
-
-3. Open your browser and navigate to `http://localhost:8000`
+**Alternative methods:**
+- Use any static file server
+- Deploy directly to GitHub Pages, Netlify, or Vercel
 
 ## Project Structure
 

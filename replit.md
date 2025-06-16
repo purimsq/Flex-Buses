@@ -2,96 +2,126 @@
 
 ## Overview
 
-Flex Bus is a client-side web application for booking bus tickets. It's built as a single-page application (SPA) using vanilla HTML, CSS, and JavaScript with no backend dependencies. The app uses browser localStorage for data persistence and simulates real-world functionality including user authentication, bus search, seat selection, and payment processing.
+Flex Bus is a modern, responsive bus booking web application built with vanilla HTML, CSS, and JavaScript. It provides a complete booking flow including bus search, seat selection, passenger management, and payment processing. The application uses client-side storage and mock data to simulate a full-featured bus booking system.
 
 ## System Architecture
 
 ### Frontend Architecture
-- **Single Page Application (SPA)**: All functionality is contained within a single HTML page with dynamic content loading
-- **Vanilla JavaScript**: No frameworks used, pure JavaScript for all functionality
-- **Component-based Structure**: JavaScript is organized into separate modules for different features (auth, booking, payment)
-- **CSS Custom Properties**: Centralized theming system using CSS variables
-- **Responsive Design**: Mobile-first approach with flexible layouts
+- **Technology Stack**: Pure HTML5, CSS3, and ES6+ JavaScript
+- **Design Pattern**: Single Page Application (SPA) with dynamic page rendering
+- **Styling**: CSS custom properties for theming, responsive grid layout
+- **State Management**: Class-based JavaScript architecture with centralized state
 
-### Client-side Routing
-- Hash-based navigation system
-- Dynamic page loading through JavaScript
-- State management through class-based application structure
+### Client-Side Architecture
+- **Main Application Class**: `BusBookingApp` handles core functionality and state
+- **Modular Structure**: Separate files for authentication, booking, and payment logic
+- **Dynamic Page Loading**: Pages are generated dynamically via JavaScript
+- **Local Storage**: Persistent data storage for user sessions and bookings
 
 ## Key Components
 
-### 1. Application Core (`scripts/app.js`)
-- Main `BusBookingApp` class that orchestrates the entire application
+### Core Application (`scripts/app.js`)
+- Central application controller
+- User session management
+- Navigation and page routing
 - Mock data generation for buses and routes
-- Local storage management for user data and bookings
-- Navigation and page management
 
-### 2. Authentication System (`scripts/auth.js`)
-- User registration and login functionality
-- Password validation and email verification
-- Session management using localStorage
-- No actual backend authentication - simulated for demo purposes
+### Authentication System (`scripts/auth.js`)
+- User registration and login
+- Form validation and security checks
+- Session persistence via localStorage
+- Password strength validation
 
-### 3. Booking Engine (`scripts/booking.js`)
-- Bus search and filtering capabilities
+### Booking Engine (`scripts/booking.js`)
+- Bus search and filtering
 - Interactive seat selection with visual seat map
 - Real-time availability simulation
-- Booking summary and pricing calculations
+- Booking state management
 
-### 4. Payment Processing (`scripts/payment.js`)
-- Multiple payment method options (Card, UPI, Net Banking)
-- Form validation for payment details
-- Simulated payment processing
-- Booking confirmation generation
+### Payment Processing (`scripts/payment.js`)
+- Multiple payment method support (Cards, UPI, Net Banking, Wallets)
+- Payment form validation
+- Booking confirmation and receipt generation
+- Transaction simulation
 
-### 5. Static Assets
-- **Icons**: SVG sprite system for scalable icons
-- **Styling**: Modular CSS with custom properties for theming
-- **Pages**: HTML templates loaded dynamically
+### User Interface
+- **Responsive Design**: Mobile-first approach with flexible grid system
+- **Color Scheme**: Red (#dc3545), Blue (#007bff), White (#ffffff) theme
+- **Component Library**: Reusable CSS classes for buttons, forms, and layouts
+- **Icon System**: SVG sprite-based icons for consistent visual elements
 
 ## Data Flow
 
-1. **User Authentication**: Login/Register → localStorage validation → UI state update
-2. **Bus Search**: Search criteria → Mock data filtering → Results display
-3. **Seat Selection**: Bus selection → Seat map generation → Availability checking
-4. **Passenger Details**: Form validation → Data collection → Booking object creation
-5. **Payment**: Payment method selection → Form processing → Confirmation generation
-6. **Booking Management**: localStorage persistence → User booking history
+1. **User Authentication**: Registration/login → localStorage persistence → UI state update
+2. **Bus Search**: Search criteria → mock data filtering → results display
+3. **Seat Selection**: Bus selection → seat map generation → availability checking
+4. **Passenger Details**: Form validation → data collection → booking state update
+5. **Payment Processing**: Payment method selection → form validation → booking confirmation
+6. **Booking Management**: localStorage retrieval → booking display → modification options
 
 ## External Dependencies
 
-### Runtime Dependencies
-- **Python HTTP Server**: Used for serving static files during development
-- **Modern Web Browser**: Requires ES6+ support for class syntax and modern JavaScript features
+### None - Completely Self-Contained
+- No external libraries or frameworks
+- No API dependencies
+- No database connections required
+- Fully functional with static file serving
 
-### No External Libraries
-- No JavaScript frameworks or libraries
-- No CSS frameworks
-- No build tools or bundlers
-- No database connections
+### Development Dependencies
+- **Live Server**: For local development (VS Code extension recommended)
+- **Modern Web Browser**: Chrome, Firefox, Safari, or Edge
 
 ## Deployment Strategy
 
-### Current Setup
-- **Static File Server**: Python's built-in HTTP server on port 5000
-- **Replit Configuration**: Configured for Python 3.11 and Node.js 20 modules
-- **Port Mapping**: Internal port 5000 mapped to external port 80
+### Static Hosting Options
+- **GitHub Pages**: Direct deployment from repository
+- **Netlify**: Drag-and-drop deployment with continuous integration
+- **Vercel**: Git-based deployment with automatic builds
+- **Local Development**: Python HTTP server or any static file server
 
-### Deployment Characteristics
-- **Zero Build Process**: Direct file serving without compilation
-- **Client-side Only**: No server-side processing required
-- **LocalStorage Persistence**: All data stored in browser storage
-- **Cross-platform Compatible**: Runs on any system with Python
+### Current Configuration
+- **Port**: 5000 (configurable)
+- **Server**: Python HTTP server for development
+- **Build Process**: None required - direct file serving
 
-### Scalability Considerations
-- Ready for conversion to use actual backend APIs
-- Mock data structure matches typical REST API responses
-- Authentication system designed to easily integrate with real auth services
-- Payment integration points prepared for actual payment gateways
+### Production Considerations
+- Minification of CSS/JS files recommended
+- Image optimization for faster loading
+- CDN integration for global distribution
+- HTTPS enforcement for security
 
 ## Changelog
+
+```
+Changelog:
 - June 16, 2025. Initial setup
+```
 
 ## User Preferences
 
+```
 Preferred communication style: Simple, everyday language.
+```
+
+## Additional Notes
+
+### Security Features
+- Client-side form validation with comprehensive checks
+- Password strength requirements
+- Email format validation
+- Data sanitization for user inputs
+
+### Future Enhancement Opportunities
+- Backend API integration for real data
+- Database integration (PostgreSQL recommended)
+- Payment gateway integration
+- Push notifications
+- Mobile app development
+- Admin dashboard for bus operators
+
+### Development Workflow
+- Start with `index.html` as the entry point
+- Modify styles in `styles/main.css`
+- Add functionality in respective JavaScript modules
+- Test across different devices and browsers
+- Deploy to chosen static hosting platform
