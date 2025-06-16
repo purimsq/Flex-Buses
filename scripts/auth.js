@@ -208,16 +208,32 @@ function loadUserProfile() {
         e.preventDefault();
         updateUserProfile();
     };
+    
+    document.getElementById('passwordForm').onsubmit = function(e) {
+        e.preventDefault();
+        changeUserPassword();
+    };
 }
 
 function updateUserProfile() {
-    const firstName = document.getElementById('profileFirstName').value;
-    const lastName = document.getElementById('profileLastName').value;
-    const email = document.getElementById('profileEmail').value;
-    const phone = document.getElementById('profilePhone').value;
+    const firstName = document.getElementById('profileFirstName').value.trim();
+    const lastName = document.getElementById('profileLastName').value.trim();
+    const email = document.getElementById('profileEmail').value.trim();
+    const phone = document.getElementById('profilePhone').value.trim();
     
     if (!firstName || !lastName || !email || !phone) {
         app.showToast('Please fill all fields', 'error');
+        return;
+    }
+    
+    // Enhanced validation
+    if (!isValidName(firstName)) {
+        app.showToast('First name must be at least 2 characters and contain only letters', 'error');
+        return;
+    }
+    
+    if (!isValidName(lastName)) {
+        app.showToast('Last name must be at least 2 characters and contain only letters', 'error');
         return;
     }
     
@@ -227,8 +243,17 @@ function updateUserProfile() {
     }
     
     if (!isValidPhone(phone)) {
-        app.showToast('Please enter a valid phone number', 'error');
+        app.showToast('Please enter a valid phone number with country code', 'error');
         return;
+    }
+    
+    // Check if email is already taken by another user
+    if (email !== app.currentUser.email) {
+        const existingUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+        if (existingUsers.find(u => u.email === email && u.id !== app.currentUser.id)) {
+            app.showToast('This email is already registered to another account', 'error');
+            return;
+        }
     }
     
     app.showLoading(true);
@@ -236,6 +261,7 @@ function updateUserProfile() {
     setTimeout(() => {
         app.showLoading(false);
         
+        // Update current user
         app.currentUser = {
             ...app.currentUser,
             firstName,
@@ -244,9 +270,74 @@ function updateUserProfile() {
             phone
         };
         
+        // Update in registered users list
+        const existingUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+        const userIndex = existingUsers.findIndex(u => u.id === app.currentUser.id);
+        if (userIndex !== -1) {
+            existingUsers[userIndex] = { ...existingUsers[userIndex], ...app.currentUser };
+            localStorage.setItem('registeredUsers', JSON.stringify(existingUsers));
+        }
+        
         localStorage.setItem('currentUser', JSON.stringify(app.currentUser));
         app.showToast('Profile updated successfully!', 'success');
     }, 1000);
+}
+
+function changeUserPassword() {
+    const currentPassword = document.getElementById('currentPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+    
+    if (!currentPassword || !newPassword || !confirmNewPassword) {
+        app.showToast('Please fill all password fields', 'error');
+        return;
+    }
+    
+    // Verify current password
+    const existingUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+    const currentUser = existingUsers.find(u => u.id === app.currentUser.id);
+    
+    if (!currentUser || currentUser.password !== currentPassword) {
+        app.showToast('Current password is incorrect', 'error');
+        return;
+    }
+    
+    // Validate new password
+    const passwordValidation = validatePassword(newPassword);
+    if (!passwordValidation.isValid) {
+        app.showToast(passwordValidation.message, 'error');
+        return;
+    }
+    
+    if (newPassword !== confirmNewPassword) {
+        app.showToast('New passwords do not match', 'error');
+        return;
+    }
+    
+    if (currentPassword === newPassword) {
+        app.showToast('New password must be different from current password', 'error');
+        return;
+    }
+    
+    app.showLoading(true);
+    
+    setTimeout(() => {
+        app.showLoading(false);
+        
+        // Update password in registered users
+        const userIndex = existingUsers.findIndex(u => u.id === app.currentUser.id);
+        if (userIndex !== -1) {
+            existingUsers[userIndex].password = newPassword;
+            localStorage.setItem('registeredUsers', JSON.stringify(existingUsers));
+        }
+        
+        // Clear password form
+        document.getElementById('currentPassword').value = '';
+        document.getElementById('newPassword').value = '';
+        document.getElementById('confirmNewPassword').value = '';
+        
+        app.showToast('Password changed successfully!', 'success');
+    }, 1500);
 }
 
 function loadUserBookings() {
@@ -411,13 +502,91 @@ function cancelBooking(bookingId) {
     }, 1000);
 }
 
-// Utility functions
+// Enhanced validation functions
 function isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+    return emailRegex.test(email) && email.length <= 254;
 }
 
 function isValidPhone(phone) {
-    const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
-    return phoneRegex.test(phone.replace(/\s+/g, ''));
+    // Remove all spaces and check if it starts with + and country code
+    const cleanPhone = phone.replace(/\s+/g, '');
+    const phoneRegex = /^\+[1-9]\d{1,14}$/;
+    return phoneRegex.test(cleanPhone);
+}
+
+function isValidName(name) {
+    // Name must be at least 2 characters, only letters, spaces, hyphens, and apostrophes
+    const nameRegex = /^[a-zA-Z\s\-']{2,50}$/;
+    return nameRegex.test(name.trim());
+}
+
+function validatePassword(password) {
+    const minLength = 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumbers = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    
+    if (password.length < minLength) {
+        return { isValid: false, message: 'Password must be at least 8 characters long' };
+    }
+    
+    if (!hasUpperCase) {
+        return { isValid: false, message: 'Password must contain at least one uppercase letter' };
+    }
+    
+    if (!hasLowerCase) {
+        return { isValid: false, message: 'Password must contain at least one lowercase letter' };
+    }
+    
+    if (!hasNumbers) {
+        return { isValid: false, message: 'Password must contain at least one number' };
+    }
+    
+    if (!hasSpecialChar) {
+        return { isValid: false, message: 'Password must contain at least one special character' };
+    }
+    
+    return { isValid: true, message: 'Password is valid' };
+}
+
+function detectUserCountry() {
+    // Simple country detection based on timezone and set default phone prefix
+    const phoneInput = document.getElementById('regPhone');
+    if (!phoneInput) return;
+    
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    let countryCode = '+1'; // Default to US
+    
+    // Common country mappings based on timezone
+    const countryMappings = {
+        'Asia/Kolkata': '+91',
+        'Asia/Calcutta': '+91',
+        'America/New_York': '+1',
+        'America/Los_Angeles': '+1',
+        'America/Chicago': '+1',
+        'Europe/London': '+44',
+        'Europe/Berlin': '+49',
+        'Europe/Paris': '+33',
+        'Asia/Tokyo': '+81',
+        'Asia/Shanghai': '+86',
+        'Australia/Sydney': '+61',
+        'Asia/Dubai': '+971',
+        'Asia/Singapore': '+65'
+    };
+    
+    if (countryMappings[timezone]) {
+        countryCode = countryMappings[timezone];
+    }
+    
+    phoneInput.placeholder = `${countryCode} 1234567890`;
+    phoneInput.value = countryCode + ' ';
+    
+    // Add event listener to maintain country code
+    phoneInput.addEventListener('input', function(e) {
+        if (!e.target.value.startsWith(countryCode)) {
+            e.target.value = countryCode + ' ' + e.target.value.replace(/^\+?\d*\s*/, '');
+        }
+    });
 }

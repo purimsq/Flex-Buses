@@ -1,8 +1,8 @@
-# BusBooking App - Replit Configuration
+# Flex Bus App - Replit Configuration
 
 ## Overview
 
-BusBooking is a client-side web application for booking bus tickets. It's built as a single-page application (SPA) using vanilla HTML, CSS, and JavaScript with no backend dependencies. The app provides a complete bus booking experience including search, seat selection, passenger details, and payment processing - all simulated on the frontend.
+Flex Bus is a client-side web application for booking bus tickets. It's built as a single-page application (SPA) using vanilla HTML, CSS, and JavaScript with no backend dependencies. The app provides a complete bus booking experience including search, seat selection, passenger details, and payment processing - all simulated on the frontend with enhanced security validation.
 
 ## System Architecture
 
@@ -28,9 +28,11 @@ BusBooking is a client-side web application for booking bus tickets. It's built 
 - **Page Routing**: Single-page navigation system
 
 ### 2. Authentication System (`scripts/auth.js`)
-- **Simulated Login/Register**: Demo authentication without backend
-- **Session Management**: LocalStorage-based user sessions
-- **Form Validation**: Client-side input validation
+- **Enhanced Registration**: Comprehensive validation with region detection
+- **Secure Login**: Email/password authentication with user data persistence
+- **Profile Management**: Secure profile editing with password change functionality
+- **Advanced Validation**: Email format, phone number with country codes, strong password requirements
+- **Session Management**: LocalStorage-based user sessions with security measures
 
 ### 3. Booking Engine (`scripts/booking.js`)
 - **Seat Selection**: Interactive seat map with availability status
@@ -119,10 +121,13 @@ Preferred communication style: Simple, everyday language.
 ### Key Features Implemented
 - Complete booking flow simulation
 - Responsive design for all screen sizes
-- Local data persistence
-- Mock payment processing
-- Dynamic seat selection
-- User authentication simulation
+- Local data persistence with secure user management
+- Mock payment processing with multiple methods
+- Dynamic seat selection with real-time availability
+- Enhanced user authentication with validation
+- Password security with complexity requirements
+- Regional phone number detection and formatting
+- Secure profile management with password change
 
 ### Technical Decisions
 - **No Backend**: Keeps deployment simple and demonstrates frontend capabilities

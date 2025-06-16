@@ -181,6 +181,9 @@ class BusBookingApp {
                                 <div class="form-group">
                                     <label for="regPassword">Password</label>
                                     <input type="password" id="regPassword" class="form-control" required>
+                                    <small style="color: var(--text-secondary); font-size: 0.85rem;">
+                                        Must be 8+ characters with uppercase, lowercase, number, and special character
+                                    </small>
                                 </div>
                                 <div class="form-group">
                                     <label for="regConfirmPassword">Confirm Password</label>
