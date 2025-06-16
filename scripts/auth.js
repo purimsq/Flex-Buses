@@ -48,8 +48,11 @@ function setupRegisterForm() {
     const registerForm = document.getElementById('registerForm');
     if (!registerForm) return;
 
-    // Auto-detect country and set phone prefix
-    detectUserCountry();
+    // Set phone number placeholder with example
+    const phoneInput = document.getElementById('regPhone');
+    if (phoneInput) {
+        phoneInput.placeholder = "e.g. +1 234 567 8901 or +91 98765 43210";
+    }
 
     registerForm.onsubmit = function(e) {
         e.preventDefault();
@@ -551,42 +554,4 @@ function validatePassword(password) {
     return { isValid: true, message: 'Password is valid' };
 }
 
-function detectUserCountry() {
-    // Simple country detection based on timezone and set default phone prefix
-    const phoneInput = document.getElementById('regPhone');
-    if (!phoneInput) return;
-    
-    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    let countryCode = '+1'; // Default to US
-    
-    // Common country mappings based on timezone
-    const countryMappings = {
-        'Asia/Kolkata': '+91',
-        'Asia/Calcutta': '+91',
-        'America/New_York': '+1',
-        'America/Los_Angeles': '+1',
-        'America/Chicago': '+1',
-        'Europe/London': '+44',
-        'Europe/Berlin': '+49',
-        'Europe/Paris': '+33',
-        'Asia/Tokyo': '+81',
-        'Asia/Shanghai': '+86',
-        'Australia/Sydney': '+61',
-        'Asia/Dubai': '+971',
-        'Asia/Singapore': '+65'
-    };
-    
-    if (countryMappings[timezone]) {
-        countryCode = countryMappings[timezone];
-    }
-    
-    phoneInput.placeholder = `${countryCode} 1234567890`;
-    phoneInput.value = countryCode + ' ';
-    
-    // Add event listener to maintain country code
-    phoneInput.addEventListener('input', function(e) {
-        if (!e.target.value.startsWith(countryCode)) {
-            e.target.value = countryCode + ' ' + e.target.value.replace(/^\+?\d*\s*/, '');
-        }
-    });
-}
+

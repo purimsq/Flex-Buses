@@ -243,7 +243,7 @@ function displayPassengerForm() {
                                         </div>
                                         <div class="form-group">
                                             <label for="contactPhone">Phone Number *</label>
-                                            <input type="tel" id="contactPhone" class="form-control" value="${app.currentUser.phone}" required>
+                                            <input type="tel" id="contactPhone" class="form-control" value="${app.currentUser.phone}" placeholder="e.g. +1 234 567 8901 or +91 98765 43210" required>
                                         </div>
                                     </div>
                                 </div>
@@ -351,7 +351,7 @@ function validateAndProceedToPayment() {
     const passengers = [];
     let isValid = true;
     
-    // Validate passenger details
+    // Enhanced passenger details validation
     for (let i = 0; i < selectedSeats.length; i++) {
         const firstName = document.getElementById(`firstName_${i}`)?.value.trim();
         const lastName = document.getElementById(`lastName_${i}`)?.value.trim();
@@ -364,8 +364,30 @@ function validateAndProceedToPayment() {
             break;
         }
         
-        if (parseInt(age) < 1 || parseInt(age) > 120) {
-            app.showToast(`Please enter a valid age for Passenger ${i + 1}`, 'error');
+        // Enhanced name validation
+        if (!isValidName(firstName)) {
+            app.showToast(`Passenger ${i + 1}: First name must be at least 2 characters and contain only letters`, 'error');
+            isValid = false;
+            break;
+        }
+        
+        if (!isValidName(lastName)) {
+            app.showToast(`Passenger ${i + 1}: Last name must be at least 2 characters and contain only letters`, 'error');
+            isValid = false;
+            break;
+        }
+        
+        // Enhanced age validation
+        const ageNum = parseInt(age);
+        if (isNaN(ageNum) || ageNum < 1 || ageNum > 120) {
+            app.showToast(`Passenger ${i + 1}: Please enter a valid age between 1 and 120`, 'error');
+            isValid = false;
+            break;
+        }
+        
+        // Check for reasonable age restrictions
+        if (ageNum < 5) {
+            app.showToast(`Passenger ${i + 1}: Children under 5 must travel with an adult. Please contact support for assistance.`, 'error');
             isValid = false;
             break;
         }
@@ -373,29 +395,42 @@ function validateAndProceedToPayment() {
         passengers.push({
             firstName,
             lastName,
-            age: parseInt(age),
+            age: ageNum,
             gender,
             seatNumber: selectedSeats[i]
         });
     }
     
-    // Validate contact information
+    // Enhanced contact information validation
     const contactEmail = document.getElementById('contactEmail')?.value.trim();
     const contactPhone = document.getElementById('contactPhone')?.value.trim();
     
     if (!contactEmail || !contactPhone) {
-        app.showToast('Please provide contact information', 'error');
+        app.showToast('Please provide complete contact information', 'error');
         isValid = false;
     }
     
     if (!isValidEmail(contactEmail)) {
-        app.showToast('Please enter a valid email address', 'error');
+        app.showToast('Please enter a valid email address for contact information', 'error');
         isValid = false;
     }
     
     if (!isValidPhone(contactPhone)) {
-        app.showToast('Please enter a valid phone number', 'error');
+        app.showToast('Please enter a valid phone number with country code (e.g. +1 234 567 8901)', 'error');
         isValid = false;
+    }
+    
+    // Check for duplicate names (family members traveling together is fine, but exact duplicates might be an error)
+    const nameCheck = new Set();
+    for (const passenger of passengers) {
+        const fullName = `${passenger.firstName} ${passenger.lastName}`.toLowerCase();
+        if (nameCheck.has(fullName)) {
+            if (!confirm(`You have entered "${passenger.firstName} ${passenger.lastName}" multiple times. Is this correct?`)) {
+                isValid = false;
+                break;
+            }
+        }
+        nameCheck.add(fullName);
     }
     
     if (!isValid) return;
