@@ -1,6 +1,4 @@
 # Development files
-.replit
-replit.nix
 poetry.lock
 pyproject.toml
 
