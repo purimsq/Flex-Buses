@@ -6,11 +6,16 @@ function setupLoginForm() {
     loginForm.onsubmit = function(e) {
         e.preventDefault();
         
-        const email = document.getElementById('loginEmail').value;
+        const email = document.getElementById('loginEmail').value.trim();
         const password = document.getElementById('loginPassword').value;
         
         if (!email || !password) {
             app.showToast('Please fill all fields', 'error');
+            return;
+        }
+        
+        if (!isValidEmail(email)) {
+            app.showToast('Please enter a valid email address', 'error');
             return;
         }
         
@@ -20,20 +25,21 @@ function setupLoginForm() {
         setTimeout(() => {
             app.showLoading(false);
             
-            // For demo purposes - accept any email/password
-            const user = {
-                id: Date.now(),
-                email: email,
-                firstName: email.split('@')[0],
-                lastName: 'User',
-                phone: '+91 9876543210'
-            };
+            // Check if user exists in localStorage (for demo)
+            const existingUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+            const user = existingUsers.find(u => u.email === email);
             
-            localStorage.setItem('currentUser', JSON.stringify(user));
-            app.currentUser = user;
-            app.updateAuthUI(true);
-            app.showToast('Login successful!', 'success');
-            showPage('home');
+            if (user && user.password === password) {
+                // Remove password from stored user data
+                const { password: _, ...userWithoutPassword } = user;
+                localStorage.setItem('currentUser', JSON.stringify(userWithoutPassword));
+                app.currentUser = userWithoutPassword;
+                app.updateAuthUI(true);
+                app.showToast('Login successful!', 'success');
+                showPage('home');
+            } else {
+                app.showToast('Invalid email or password', 'error');
+            }
         }, 1500);
     };
 }
@@ -42,33 +48,64 @@ function setupRegisterForm() {
     const registerForm = document.getElementById('registerForm');
     if (!registerForm) return;
 
+    // Auto-detect country and set phone prefix
+    detectUserCountry();
+
     registerForm.onsubmit = function(e) {
         e.preventDefault();
         
-        const firstName = document.getElementById('regFirstName').value;
-        const lastName = document.getElementById('regLastName').value;
-        const email = document.getElementById('regEmail').value;
-        const phone = document.getElementById('regPhone').value;
+        const firstName = document.getElementById('regFirstName').value.trim();
+        const lastName = document.getElementById('regLastName').value.trim();
+        const email = document.getElementById('regEmail').value.trim();
+        const phone = document.getElementById('regPhone').value.trim();
         const password = document.getElementById('regPassword').value;
         const confirmPassword = document.getElementById('regConfirmPassword').value;
         
+        // Enhanced validation
         if (!firstName || !lastName || !email || !phone || !password || !confirmPassword) {
             app.showToast('Please fill all fields', 'error');
             return;
         }
         
-        if (password !== confirmPassword) {
-            app.showToast('Passwords do not match', 'error');
+        // Name validation
+        if (!isValidName(firstName)) {
+            app.showToast('First name must be at least 2 characters and contain only letters', 'error');
             return;
         }
         
+        if (!isValidName(lastName)) {
+            app.showToast('Last name must be at least 2 characters and contain only letters', 'error');
+            return;
+        }
+        
+        // Email validation
         if (!isValidEmail(email)) {
             app.showToast('Please enter a valid email address', 'error');
             return;
         }
         
+        // Check if email already exists
+        const existingUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+        if (existingUsers.find(u => u.email === email)) {
+            app.showToast('An account with this email already exists', 'error');
+            return;
+        }
+        
+        // Phone validation
         if (!isValidPhone(phone)) {
-            app.showToast('Please enter a valid phone number', 'error');
+            app.showToast('Please enter a valid phone number with country code', 'error');
+            return;
+        }
+        
+        // Password validation
+        const passwordValidation = validatePassword(password);
+        if (!passwordValidation.isValid) {
+            app.showToast(passwordValidation.message, 'error');
+            return;
+        }
+        
+        if (password !== confirmPassword) {
+            app.showToast('Passwords do not match', 'error');
             return;
         }
         
@@ -83,11 +120,18 @@ function setupRegisterForm() {
                 firstName,
                 lastName,
                 email,
-                phone
+                phone,
+                password // Store password for demo (in real app, this would be hashed)
             };
             
-            localStorage.setItem('currentUser', JSON.stringify(user));
-            app.currentUser = user;
+            // Store user in registered users list
+            existingUsers.push(user);
+            localStorage.setItem('registeredUsers', JSON.stringify(existingUsers));
+            
+            // Set current user (without password)
+            const { password: _, ...userWithoutPassword } = user;
+            localStorage.setItem('currentUser', JSON.stringify(userWithoutPassword));
+            app.currentUser = userWithoutPassword;
             app.updateAuthUI(true);
             app.showToast('Account created successfully!', 'success');
             showPage('home');
@@ -110,27 +154,54 @@ function loadUserProfile() {
     }
     
     profileContent.innerHTML = `
-        <form id="profileForm">
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="profileFirstName">First Name</label>
-                    <input type="text" id="profileFirstName" class="form-control" value="${app.currentUser.firstName}" required>
-                </div>
-                <div class="form-group">
-                    <label for="profileLastName">Last Name</label>
-                    <input type="text" id="profileLastName" class="form-control" value="${app.currentUser.lastName}" required>
-                </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+            <div>
+                <h3>Personal Information</h3>
+                <form id="profileForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="profileFirstName">First Name</label>
+                            <input type="text" id="profileFirstName" class="form-control" value="${app.currentUser.firstName}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profileLastName">Last Name</label>
+                            <input type="text" id="profileLastName" class="form-control" value="${app.currentUser.lastName}" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="profileEmail">Email</label>
+                        <input type="email" id="profileEmail" class="form-control" value="${app.currentUser.email}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="profilePhone">Phone Number</label>
+                        <input type="tel" id="profilePhone" class="form-control" value="${app.currentUser.phone}" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Profile</button>
+                </form>
             </div>
-            <div class="form-group">
-                <label for="profileEmail">Email</label>
-                <input type="email" id="profileEmail" class="form-control" value="${app.currentUser.email}" required>
+            
+            <div>
+                <h3>Change Password</h3>
+                <form id="passwordForm">
+                    <div class="form-group">
+                        <label for="currentPassword">Current Password</label>
+                        <input type="password" id="currentPassword" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword">New Password</label>
+                        <input type="password" id="newPassword" class="form-control" required>
+                        <small style="color: var(--text-secondary); font-size: 0.85rem;">
+                            Password must be 8+ characters with uppercase, lowercase, number, and special character
+                        </small>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmNewPassword">Confirm New Password</label>
+                        <input type="password" id="confirmNewPassword" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-secondary">Change Password</button>
+                </form>
             </div>
-            <div class="form-group">
-                <label for="profilePhone">Phone Number</label>
-                <input type="tel" id="profilePhone" class="form-control" value="${app.currentUser.phone}" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Update Profile</button>
-        </form>
+        </div>
     `;
     
     document.getElementById('profileForm').onsubmit = function(e) {
