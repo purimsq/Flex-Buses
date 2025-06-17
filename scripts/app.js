@@ -394,6 +394,7 @@ function swapCities() {
 }
 
 function searchBuses() {
+    const fromCity = document('fromCity').value;
     const toCity = document.getElementById('toCity').value;
     const departureDate = document.getElementById('departureDate').value;
     const passengers = document.getElementById('passengers').value;
