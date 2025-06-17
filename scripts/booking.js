@@ -128,22 +128,22 @@ function updateBookingSummary() {
         
         <div class="summary-item">
             <span>Seat Price:</span>
-            <span>₹${seatPrice}</span>
+            <span>Ksh ${seatPrice}</span>
         </div>
         
         <div class="summary-item">
             <span>Subtotal:</span>
-            <span>₹${subtotal}</span>
+            <span>Ksh ${subtotal}</span>
         </div>
         
         <div class="summary-item">
             <span>Taxes & Fees:</span>
-            <span>₹${taxes}</span>
+            <span>Ksh ${taxes}</span>
         </div>
         
         <div class="summary-item total">
             <span>Total Amount:</span>
-            <span>₹${total}</span>
+            <span>Ksh ${total}</span>
         </div>
         
         <button class="btn btn-primary btn-large" 
@@ -326,22 +326,22 @@ function generateBookingSummaryHTML() {
         
         <div class="summary-item">
             <span>Seat Price:</span>
-            <span>₹${pricing.seatPrice}</span>
+            <span>Ksh ${pricing.seatPrice}</span>
         </div>
         
         <div class="summary-item">
             <span>Subtotal:</span>
-            <span>₹${pricing.subtotal}</span>
+            <span>Ksh ${pricing.subtotal}</span>
         </div>
         
         <div class="summary-item">
             <span>Taxes & Fees:</span>
-            <span>₹${pricing.taxes}</span>
+            <span>Ksh ${pricing.taxes}</span>
         </div>
         
         <div class="summary-item total">
             <span>Total Amount:</span>
-            <span>₹${pricing.total}</span>
+            <span>Ksh ${pricing.total}</span>
         </div>
     `;
 }

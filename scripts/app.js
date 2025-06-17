@@ -454,7 +454,7 @@ function displayBusResults() {
                     <p class="bus-type">${bus.type}</p>
                 </div>
                 <div class="price-info">
-                    <div class="price">₹${bus.price}</div>
+                    <div class="price">Ksh ${bus.price}</div>
                     <div style="font-size: 0.9rem; color: var(--text-secondary);">per seat</div>
                 </div>
             </div>
