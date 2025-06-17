@@ -378,7 +378,7 @@ function loadUserBookings() {
                     <p class="bus-type">Booking ID: ${booking.bookingId}</p>
                 </div>
                 <div class="price-info">
-                    <div class="price">₹${booking.totalAmount}</div>
+                    <div class="price">Ksh ${booking.totalAmount}</div>
                     <div style="font-size: 0.9rem; color: var(--text-secondary);">${booking.passengers.length} passenger(s)</div>
                 </div>
             </div>
@@ -464,7 +464,7 @@ function printTicket(bookingId) {
                     </div>
                     <div>
                         <div class="detail-row"><strong>Seats:</strong> ${booking.selectedSeats.join(', ')}</div>
-                        <div class="detail-row"><strong>Amount:</strong> ₹${booking.totalAmount}</div>
+                        <div class="detail-row"><strong>Amount:</strong> Ksh ${booking.totalAmount}</div>
                         <div class="detail-row"><strong>Status:</strong> ${booking.status}</div>
                         <div class="detail-row"><strong>Booked:</strong> ${new Date(booking.bookingDate).toLocaleDateString()}</div>
                     </div>

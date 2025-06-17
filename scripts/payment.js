@@ -132,7 +132,7 @@ function displayPaymentForm() {
                                 </div>
                                 
                                 <button type="submit" class="btn btn-primary btn-large" style="width: 100%;" id="paymentButton" disabled>
-                                    Pay ₹${pricing.total}
+                                    Pay Ksh ${pricing.total}
                                 </button>
                             </form>
                         </div>
@@ -439,7 +439,7 @@ function displayConfirmationPage() {
                                 </div>
                                 <div class="ticket-item">
                                     <strong>Amount:</strong>
-                                    <span>₹${booking.totalAmount}</span>
+                                    <span>Ksh ${booking.totalAmount}</span>
                                 </div>
                             </div>
                         </div>
